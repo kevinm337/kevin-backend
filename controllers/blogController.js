@@ -1,45 +1,30 @@
-// blogController.js
+// controllers/blogController.js
 const pool = require("../models/db");
 
-
 // GET /api/blogs
-async function getAllBlogs(req, res) {
+exports.getAllBlogs = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT b.id,
-              b.title,
-              b.content,
-              b.image_url,
-              b.created_at,
-              b.updated_at,
-              u.username AS author_username
-       FROM blogs b
-       JOIN users u ON b.author_id = u.id
-       ORDER BY b.created_at DESC`
+      `SELECT id, title, content, image_url, created_at, updated_at
+       FROM blogs
+       ORDER BY created_at DESC`
     );
     res.json(result.rows);
   } catch (err) {
     console.error("GetAllBlogs error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
-}
+};
 
 // GET /api/blogs/:id
-async function getBlogById(req, res) {
+exports.getBlogById = async (req, res) => {
   const { id } = req.params;
 
   try {
     const result = await pool.query(
-      `SELECT b.id,
-              b.title,
-              b.content,
-              b.image_url,
-              b.created_at,
-              b.updated_at,
-              u.username AS author_username
-       FROM blogs b
-       JOIN users u ON b.author_id = u.id
-       WHERE b.id = $1`,
+      `SELECT id, title, content, image_url, created_at, updated_at
+       FROM blogs
+       WHERE id = $1`,
       [id]
     );
 
@@ -52,10 +37,10 @@ async function getBlogById(req, res) {
     console.error("GetBlogById error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
-}
+};
 
 // POST /api/blogs  (protected)
-async function createBlog(req, res) {
+exports.createBlog = async (req, res) => {
   const { title, content, image_url } = req.body;
 
   if (!title || !content) {
@@ -64,10 +49,10 @@ async function createBlog(req, res) {
 
   try {
     const result = await pool.query(
-      `INSERT INTO blogs (title, content, image_url, author_id)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id, title, content, image_url, author_id, created_at, updated_at`,
-      [title, content, image_url || null, req.user.id]
+      `INSERT INTO blogs (title, content, image_url)
+       VALUES ($1, $2, $3)
+       RETURNING id, title, content, image_url, created_at, updated_at`,
+      [title, content, image_url || null]
     );
 
     res.status(201).json({
@@ -78,26 +63,21 @@ async function createBlog(req, res) {
     console.error("CreateBlog error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
-}
+};
 
-// PUT /api/blogs/:id  (protected, owner only)
-async function updateBlog(req, res) {
+// PUT /api/blogs/:id  (protected)
+exports.updateBlog = async (req, res) => {
   const { id } = req.params;
   const { title, content, image_url } = req.body;
 
   try {
-    // Check owner
     const existing = await pool.query(
-      "SELECT id, author_id FROM blogs WHERE id = $1",
+      "SELECT id FROM blogs WHERE id = $1",
       [id]
     );
 
     if (existing.rows.length === 0) {
       return res.status(404).json({ error: "Blog not found" });
-    }
-
-    if (existing.rows[0].author_id !== req.user.id) {
-      return res.status(403).json({ error: "You can only edit your own blogs" });
     }
 
     const result = await pool.query(
@@ -107,7 +87,7 @@ async function updateBlog(req, res) {
            image_url = COALESCE($3, image_url),
            updated_at = NOW()
        WHERE id = $4
-       RETURNING id, title, content, image_url, author_id, created_at, updated_at`,
+       RETURNING id, title, content, image_url, created_at, updated_at`,
       [title, content, image_url, id]
     );
 
@@ -119,24 +99,20 @@ async function updateBlog(req, res) {
     console.error("UpdateBlog error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
-}
+};
 
-// DELETE /api/blogs/:id  (protected, owner only)
-async function deleteBlog(req, res) {
+// DELETE /api/blogs/:id  (protected)
+exports.deleteBlog = async (req, res) => {
   const { id } = req.params;
 
   try {
     const existing = await pool.query(
-      "SELECT id, author_id FROM blogs WHERE id = $1",
+      "SELECT id FROM blogs WHERE id = $1",
       [id]
     );
 
     if (existing.rows.length === 0) {
       return res.status(404).json({ error: "Blog not found" });
-    }
-
-    if (existing.rows[0].author_id !== req.user.id) {
-      return res.status(403).json({ error: "You can only delete your own blogs" });
     }
 
     await pool.query("DELETE FROM blogs WHERE id = $1", [id]);
@@ -146,12 +122,4 @@ async function deleteBlog(req, res) {
     console.error("DeleteBlog error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
-}
-
-module.exports = {
-  getAllBlogs,
-  getBlogById,
-  createBlog,
-  updateBlog,
-  deleteBlog,
 };
