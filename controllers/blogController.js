@@ -1,5 +1,6 @@
 // blogController.js
-const pool = require("./db");
+const pool = require("../models/db");
+
 
 // GET /api/blogs
 async function getAllBlogs(req, res) {
