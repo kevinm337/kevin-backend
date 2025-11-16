@@ -4,8 +4,9 @@ const cors = require("cors");
 require("dotenv").config();
 require("./models/db");// just to initialize and log connection
 
-const authRoutes = require("./authRoutes");
-const blogRoutes = require("./blogRoutes");
+const authRoutes = require("./routes/authRoutes");
+const blogRoutes = require("./routes/blogRoutes");
+
 
 const app = express();
 
