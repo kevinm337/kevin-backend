@@ -1,14 +1,11 @@
 const pool = require('../models/db');
 
-// =========================================================
-// GET ALL POSTS  →  GET /api/blogs
-// =========================================================
+// GET ALL POSTS
 exports.getAllPosts = async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT * FROM posts ORDER BY created_at DESC'
+      'SELECT * FROM blogs ORDER BY created_at DESC'
     );
-
     res.json(result.rows);
   } catch (err) {
     console.error('Error fetching posts:', err);
@@ -16,15 +13,13 @@ exports.getAllPosts = async (req, res) => {
   }
 };
 
-// =========================================================
-// GET ONE POST BY ID  →  GET /api/blogs/:id
-// =========================================================
+// GET POST BY ID
 exports.getPostById = async (req, res) => {
   try {
     const { id } = req.params;
 
     const result = await pool.query(
-      'SELECT * FROM posts WHERE id = $1',
+      'SELECT * FROM blogs WHERE id = $1',
       [id]
     );
 
@@ -39,9 +34,7 @@ exports.getPostById = async (req, res) => {
   }
 };
 
-// =========================================================
-// CREATE POST  →  POST /api/blogs
-// =========================================================
+// CREATE POST
 exports.createPost = async (req, res) => {
   try {
     const { title, content } = req.body;
@@ -51,7 +44,7 @@ exports.createPost = async (req, res) => {
     }
 
     await pool.query(
-      'INSERT INTO posts (title, content) VALUES ($1, $2)',
+      'INSERT INTO blogs (title, content) VALUES ($1, $2)',
       [title, content]
     );
 
@@ -62,16 +55,14 @@ exports.createPost = async (req, res) => {
   }
 };
 
-// =========================================================
-// UPDATE POST  →  PUT /api/blogs/:id
-// =========================================================
+// UPDATE POST
 exports.updatePost = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content } = req.body;
 
     await pool.query(
-      'UPDATE posts SET title = $1, content = $2 WHERE id = $3',
+      'UPDATE blogs SET title = $1, content = $2 WHERE id = $3',
       [title, content, id]
     );
 
@@ -82,14 +73,15 @@ exports.updatePost = async (req, res) => {
   }
 };
 
-// =========================================================
-// DELETE POST  →  DELETE /api/blogs/:id
-// =========================================================
+// DELETE POST
 exports.deletePost = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await pool.query('DELETE FROM posts WHERE id = $1', [id]);
+    await pool.query(
+      'DELETE FROM blogs WHERE id = $1',
+      [id]
+    );
 
     res.json({ message: 'Post deleted' });
   } catch (err) {
