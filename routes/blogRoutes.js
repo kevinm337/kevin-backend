@@ -6,8 +6,9 @@ const {
   createBlog,
   updateBlog,
   deleteBlog,
-} = require("./blogController");
-const { authenticate } = require("./authController");
+} = require("../controllers/blogController");
+
+const { authenticate } = require("../controllers/authController");
 
 const router = express.Router();
 
