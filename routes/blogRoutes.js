@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db');  // <-- make sure this path matches your db.js location
+const pool = require('../db');  // adjust if needed
 
 const {
   getAllPosts,
@@ -10,15 +10,8 @@ const {
   deletePost
 } = require('../controllers/blogController');
 
-// Existing routes
-router.get('/', getAllPosts);
-router.get('/:id', getPostById);
-router.post('/', createPost);
-router.put('/:id', updatePost);
-router.delete('/:id', deletePost);
-
 // ----------------------------------------------
-// TEMPORARY SEED ROUTE — DO NOT KEEP PERMANENTLY
+// TEMPORARY SEED ROUTE — MUST BE BEFORE /:id
 // ----------------------------------------------
 router.get('/seed/one', async (req, res) => {
   try {
@@ -37,5 +30,12 @@ router.get('/seed/one', async (req, res) => {
   }
 });
 // ----------------------------------------------
+
+// Existing routes
+router.get('/', getAllPosts);
+router.get('/:id', getPostById);
+router.post('/', createPost);
+router.put('/:id', updatePost);
+router.delete('/:id', deletePost);
 
 module.exports = router;
