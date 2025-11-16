@@ -10,7 +10,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✔ Correct route mounting
 app.use('/api/blogs', blogRoutes);
 app.use('/api/auth', authRoutes);
 
@@ -22,4 +21,5 @@ app.get('/debug', (req, res) => {
   res.send("Debug route reached ✔");
 });
 
-app.listen(8080, () => console.log("Server running on port 8080"));
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
