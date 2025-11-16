@@ -1,25 +1,33 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+// server.js
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+require("./db"); // just to initialize and log connection
 
-const blogRoutes = require('./routes/blogRoutes');
-const authRoutes = require('./routes/authRoutes');
+const authRoutes = require("./authRoutes");
+const blogRoutes = require("./blogRoutes");
 
 const app = express();
 
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/blogs', blogRoutes);
-app.use('/api/auth', authRoutes);
-
-app.get('/', (req, res) => {
-  res.send('Kevin backend is running');
+// Health check
+app.get("/", (req, res) => {
+  res.json({ status: "ok", message: "Kevin backend is running" });
 });
 
-app.get('/debug', (req, res) => {
-  res.send("Debug route reached ✔");
+// Route mounting
+app.use("/api/auth", authRoutes);
+app.use("/api/blogs", blogRoutes);
+
+// Fallback for unknown routes
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
 });
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
+});
