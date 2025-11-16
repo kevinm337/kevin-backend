@@ -2,7 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-require("./db"); // just to initialize and log connection
+require("./models/db");// just to initialize and log connection
 
 const authRoutes = require("./authRoutes");
 const blogRoutes = require("./blogRoutes");
