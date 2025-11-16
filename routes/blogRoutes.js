@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db');  // Correct db import
+const pool = require('../models/db');  // Correct db import
 
 const {
   getAllPosts,
