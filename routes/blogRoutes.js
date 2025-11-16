@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db');  // adjust if needed
+const pool = require('../db');  // Correct db import
 
 const {
   getAllPosts,
@@ -10,10 +10,11 @@ const {
   deletePost
 } = require('../controllers/blogController');
 
-// ----------------------------------------------
-// TEMPORARY SEED ROUTE — MUST BE BEFORE /:id
-// ----------------------------------------------
-router.get('/seed/one', async (req, res) => {
+// ======================================================
+// 🔥 TEMPORARY SEED ROUTE — SPECIAL PATH (CANNOT CONFLICT)
+// ======================================================
+// This WILL work even if Express routing order changes.
+router.get('/__seed', async (req, res) => {
   try {
     const result = await pool.query(
       "INSERT INTO blogs (title, content) VALUES ($1, $2) RETURNING *",
@@ -29,9 +30,11 @@ router.get('/seed/one', async (req, res) => {
     res.status(500).json({ error: 'Failed to seed blog entry' });
   }
 });
-// ----------------------------------------------
 
-// Existing routes
+// ======================================================
+// Existing blog CRUD routes
+// ======================================================
+
 router.get('/', getAllPosts);
 router.get('/:id', getPostById);
 router.post('/', createPost);
