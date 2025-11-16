@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../models/db');  // Correct db import
+const pool = require('../models/db');  // Correct path to db.js
 
 const {
   getAllPosts,
@@ -10,10 +10,28 @@ const {
   deletePost
 } = require('../controllers/blogController');
 
+
 // ======================================================
-// 🔥 TEMPORARY SEED ROUTE — SPECIAL PATH (CANNOT CONFLICT)
+// 🔍 DEBUG: CHECK EXISTING TABLES IN YOUR DATABASE
+// Visit: /api/blogs/__tables
 // ======================================================
-// This WILL work even if Express routing order changes.
+router.get('/__tables', async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Tables debug error:", err);
+    res.status(500).json({ error: 'Table check failed' });
+  }
+});
+
+
+// ======================================================
+// 🔥 TEMPORARY SEED ROUTE — SAFE NAME THAT CANNOT CONFLICT
+// Visit: /api/blogs/__seed
+// ======================================================
 router.get('/__seed', async (req, res) => {
   try {
     const result = await pool.query(
@@ -31,10 +49,10 @@ router.get('/__seed', async (req, res) => {
   }
 });
 
-// ======================================================
-// Existing blog CRUD routes
-// ======================================================
 
+// ======================================================
+// 📌 BLOG CRUD ROUTES
+// ======================================================
 router.get('/', getAllPosts);
 router.get('/:id', getPostById);
 router.post('/', createPost);
