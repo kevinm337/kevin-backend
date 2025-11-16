@@ -24,6 +24,11 @@ app.use("/api/auth", authRoutes);
 app.use("/api/blogs", blogRoutes);
 
 // Fallback for unknown routes
+app.get("/api/blogs-debug", (req, res) => {
+  res.json({ ok: true, message: "blogs-debug hit" });
+});
+
+// Fallback for unknown routes
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
